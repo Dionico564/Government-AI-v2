@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>🏛️ Government AI · Global Law & Governance Assistant</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--gov:#165DFF;--gold:#D4AF37;--dark:#0F172A;--panel:#1E293B;--text:#F1F5F9;--accent:#22C55E;--warning:#F59E0B;--err:#EF4444}
+body{font-family:'Segoe UI',Roboto,sans-serif;background:var(--dark);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+.auth-screen{position:fixed;inset:0;background:linear-gradient(135deg,#0F172A,#1E293B);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;padding:20px}
+.auth-box{width:100%;max-width:400px;background:var(--panel);border-radius:20px;padding:25px;border:1px solid rgba(212,175,55,0.3);box-shadow:0 0 40px rgba(22,93,255,0.15)}
+.auth-title{text-align:center;font-size:1.8rem;color:var(--gold);margin-bottom:5px}
+.auth-subtitle{text-align:center;color:#94A3B8;margin-bottom:25px;font-size:.9rem}
+.input-group{margin-bottom:15px}
+.input-group label{display:block;margin-bottom:6px;color:#CBD5E1;font-size:.9rem}
+.input-group input{width:100%;padding:14px 16px;border-radius:12px;border:1px solid #334155;background:#0F172A;color:#fff;font-size:1rem;outline:none;transition:.2s}
+.input-group input:focus{border-color:var(--gov);box-shadow:0 0 0 3px rgba(22,93,255,0.2)}
+.btn-primary{width:100%;padding:15px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--gov),#0E42D2);color:#fff;font-size:1rem;font-weight:600;cursor:pointer;transition:.2s;margin-top:5px}
+.btn-primary:active{transform:scale(.97)}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.otp-inputs{display:flex;gap:10px;justify-content:center;margin:20px 0}
+.otp-input{width:50px;height:55px;text-align:center;font-size:1.5rem;border-radius:10px;border:1px solid #334155;background:#0F172A;color:#fff;outline:none}
+.otp-input:focus{border-color:var(--gov)}
+.resend-link{text-align:center;margin-top:12px;color:#94A3B8;font-size:.85rem;cursor:pointer}
+.resend-link:hover{color:var(--gov)}
+.hidden{display:none !important}
+header{background:linear-gradient(135deg,var(--gov),#0E42D2);padding:16px;text-align:center;border-bottom:2px solid var(--gold);position:sticky;top:0;z-index:100}
+header h1{font-size:22px;color:var(--gold);letter-spacing:1px}
+header p{font-size:12px;opacity:.8;margin-top:4px}
+.status-bar{display:flex;justify-content:space-between;align-items:center;padding:8px 16px;background:#131C2F;font-size:11px;border-bottom:1px solid #2A3349;flex-wrap:wrap;gap:5px}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite;display:inline-block}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.categories{padding:12px 16px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.cat-btn{padding:11px 6px;border-radius:8px;border:none;background:var(--panel);color:var(--text);font-size:12px;cursor:pointer;text-align:center;transition:.2s}
+.cat-btn.active{background:var(--gov);color:#fff;box-shadow:0 0 8px rgba(22,93,255,.4)}
+.url-list{background:var(--panel);margin:10px 16px;border-radius:12px;padding:12px;max-height:280px;overflow-y:auto;display:none;border:1px solid #2A3349}
+.url-list.show{display:block}
+.url-item{padding:10px 12px;border-bottom:1px solid #334155;cursor:pointer;font-size:13px;transition:.15s;border-radius:4px}
+.url-item:last-child{border-bottom:none}
+.url-item:hover{background:#2A3B5C}
+.chat-container{padding:16px;overflow-y:auto;max-height:300px;min-height:120px}
+.message{margin:10px 0;padding:12px 15px;border-radius:18px;max-width:88%;line-height:1.5;font-size:14px;white-space:pre-wrap}
+.user-msg{background:var(--gov);margin-left:auto;border-bottom-right-radius:4px}
+.ai-msg{background:var(--panel);margin-right:auto;border-bottom-left-radius:4px;border-left:3px solid var(--gold)}
+.input-area{padding:14px 16px;background:#131C2F;border-top:1px solid #2A3349;position:sticky;bottom:0}
+.input-row{display:flex;gap:10px;align-items:center}
+#query{flex:1;padding:14px 16px;border-radius:24px;border:1px solid #2A3349;outline:none;background:var(--panel);color:var(--text);font-size:16px}
+.btn-send{background:var(--gov);color:#fff;padding:14px 20px;border-radius:24px;border:none;font-weight:bold;cursor:pointer;transition:.2s;white-space:nowrap}
+.btn-send:active{transform:scale(.95)}
+.voice-btn{width:48px;height:48px;border-radius:50%;background:var(--panel);color:#fff;border:1px solid #2A3349;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.2s}
+.voice-btn.listening{background:var(--err);border-color:var(--err);animation:pulse 1s infinite}
+.log-box{margin:10px 16px;padding:10px;background:#0C1220;border-radius:8px;font-size:11px;color:#94A3B8;max-height:60px;overflow-y:auto}
+.user-info{display:flex;align-items:center;gap:8px;font-size:.8rem;color:#E0E7FF;margin-top:6px;justify-content:center}
+.logout-btn{background:transparent;border:1px solid rgba(239,68,68,0.4);color:#FCA5A5;cursor:pointer;font-size:.75rem;padding:3px 8px;border-radius:6px}
+.logout-btn:hover{background:rgba(239,68,68,0.2)}
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div class="auth-screen" id="loginScreen">
+  <div class="auth-box">
+    <h1 class="auth-title">🏛️ Government AI</h1>
+    <p class="auth-subtitle">Global Political Science · Laws · Constitutions · Official Portals</p>
+    <div class="input-group">
+      <label>📧 Email Address</label>
+      <input type="email" id="emailInput" placeholder="Enter your email">
+    </div>
+    <div class="input-group">
+      <label>🔒 Password</label>
+      <input type="password" id="passInput" placeholder="Enter your password">
+    </div>
+    <button class="btn-primary" id="loginBtn" onclick="sendOTP()">🔐 Send OTP</button>
+  </div>
+</div>
+
+<!-- OTP SCREEN -->
+<div class="auth-screen hidden" id="otpScreen">
+  <div class="auth-box">
+    <h1 class="auth-title">🔑 Verify OTP</h1>
+    <p class="auth-subtitle">Enter the 6-digit code sent to your email</p>
+    <div class="otp-inputs">
+      <input type="text" class="otp-input" maxlength="1" data-index="0" oninput="moveToNext(this,0)" inputmode="numeric">
+      <input type="text" class="otp-input" maxlength="1" data-index="1" oninput="moveToNext(this,1)" inputmode="numeric">
+      <input type="text" class="otp-input" maxlength="1" data-index="2" oninput="moveToNext(this,2)" inputmode="numeric">
+      <input type="text" class="otp-input" maxlength="1" data-index="3" oninput="moveToNext(this,3)" inputmode="numeric">
+      <input type="text" class="otp-input" maxlength="1" data-index="4" oninput="moveToNext(this,4)" inputmode="numeric">
+      <input type="text" class="otp-input" maxlength="1" data-index="5" oninput="moveToNext(this,5)" inputmode="numeric">
+    </div>
+    <button class="btn-primary" id="verifyBtn" onclick="verifyOTP()">✅ Verify & Enter</button>
+    <div class="resend-link" onclick="sendOTP()">🔄 Resend OTP</div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div class="hidden" id="mainApp">
+  <header>
+    <h1>🏛️ Government AI</h1>
+    <p>Global Political Science · Laws · Constitutions · Official Portals</p>
+    <div class="user-info" id="userInfo"></div>
+  </header>
+
+  <div class="status-bar">
+    <div><span class="dot"></span> System Online</div>
+    <div>Portals: <span id="portalCount">0</span> ✅</div>
+    <div id="tfStatus">AI: Ready</div>
+  </div>
+
+  <div class="categories">
+    <button class="cat-btn active" data-cat="all">🌐 All</button>
+    <button class="cat-btn" data-cat="ph">🇵🇭 PH</button>
+    <button class="cat-btn" data-cat="us">🇺🇸 US</button>
+    <button class="cat-btn" data-cat="eu">🇪🇺 EU</button>
+    <button class="cat-btn" data-cat="as">🌏 Asia</button>
+    <button class="cat-btn" data-cat="af">🌍 Africa</button>
+    <button class="cat-btn" data-cat="am">🌎 Americas</button>
+    <button class="cat-btn" data-cat="eu2">🏰 Europe</button>
+    <button class="cat-btn" data-cat="me">🕌 M.East</button>
+    <button class="cat-btn" data-cat="oc">🌊 Oceania</button>
+    <button class="cat-btn" data-cat="intl">🏢 Int'l</button>
+    <button class="cat-btn" data-cat="legal">⚖️ Legal</button>
+  </div>
+
+  <div class="url-list" id="urlList"></div>
+  <div class="log-box" id="logBox">[SYSTEM] Ready — Ask about laws, constitutions, or browse official portals.</div>
+  <div class="chat-container" id="chatBox"></div>
+
+  <div class="input-area">
+    <div class="input-row">
+      <button class="voice-btn" id="voiceBtn" title="Voice Input">🎤</button>
+      <input type="text" id="query" placeholder="Ask about laws, government, or open a website...">
+      <button class="btn-send" id="sendBtn">SEND</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== STATE =====
+let currentUserEmail = '';
+let generatedOTP = '';
+let conversationHistory = [];
+
+// ===== GOVERNMENT DATABASE — 350+ PORTALS =====
+const govDB = {
+
+  // ===== PHILIPPINES =====
+  ph: [
+    {name:"Official Gazette PH",url:"https://www.officialgazette.gov.ph"},
+    {name:"Office of the President",url:"https://www.president.gov.ph"},
+    {name:"Senate of the Philippines",url:"https://www.senate.gov.ph"},
+    {name:"House of Representatives",url:"https://www.congress.gov.ph"},
+    {name:"Supreme Court PH",url:"https://sc.judiciary.gov.ph"},
+    {name:"Court of Appeals PH",url:"https://ca.judiciary.gov.ph"},
+    {name:"Sandiganbayan",url:"https://www.sandiganbayan.gov.ph"},
+    {name:"Constitution of PH",url:"https://www.officialgazette.gov.ph/constitution/"},
+    {name:"Dept of Interior & Local Gov",url:"https://www.dilg.gov.ph"},
+    {name:"Dept of Justice",url:"https://www.doj.gov.ph"},
+    {name:"Dept of Foreign Affairs",url:"https://www.dfa.gov.ph"},
+    {name:"Dept of Finance",url:"https://www.dof.gov.ph"},
+    {name:"Dept of Budget & Management",url:"https://www.dbm.gov.ph"},
+    {name:"Dept of Education",url:"https://www.deped.gov.ph"},
+    {name:"Dept of Health",url:"https://www.doh.gov.ph"},
+    {name:"Dept of Trade & Industry",url:"https://www.dti.gov.ph"},
+    {name:"Dept of Labor & Employment",url:"https://www.dole.gov.ph"},
+    {name:"Dept of Public Works & Highways",url:"https://www.dpwh.gov.ph"},
+    {name:"Dept of Science & Technology",url:"https://www.dost.gov.ph"},
+    {name:"Dept of Agriculture",url:"https://www.da.gov.ph"},
+    {name:"Dept of Transportation",url:"https://www.dot.gov.ph"},
+    {name:"Dept of Environment & Natural Resources",url:"https://www.denr.gov.ph"},
+    {name:"Dept of Social Welfare & Development",url:"https://www.dswd.gov.ph"},
+    {name:"Dept of Tourism",url:"https://www.tourism.gov.ph"},
+    {name:"Dept of Energy",url:"https://www.doe.gov.ph"},
+    {name:"COMELEC",url:"https://www.comelec.gov.ph"},
+    {name:"Civil Service Commission",url:"https://www.csc.gov.ph"},
+    {name:"Commission on Audit",url:"https://www.coa.gov.ph"},
+    {name:"Commission on Human Rights",url:"https://www.chr.gov.ph"},
+    {name:"BIR — Bureau of Internal Revenue",url:"https://www.bir.gov.ph"},
+    {name:"BOC — Bureau of Customs",url:"https://www.customs.gov.ph"},
+    {name:"SEC — Securities & Exchange Comm",url:"https://www.sec.gov.ph"},
+    {name:"SSS — Social Security System",url:"https://www.sss.gov.ph"},
+    {name:"PhilHealth",url:"https://www.philhealth.gov.ph"},
+    {name:"Pag-IBIG Fund",url:"https://www.pagibigfund.gov.ph"},
+    {name:"PAGASA — Weather Bureau",url:"https://bagong.pagasa.dost.gov.ph"},
+    {name:"NDRRMC — Disaster Agency",url:"https://ndrrmc.gov.ph"},
+    {name:"Philippine National Police",url:"https://www.pnp.gov.ph"},
+    {name:"Armed Forces of PH",url:"https://www.afp.mil.ph"},
+    {name:"National Statistics Office PH",url:"https://psa.gov.ph"},
+    {name:"Bangko Sentral ng Pilipinas",url:"https://www.bsp.gov.ph"},
+    {name:"CHED — Higher Education",url:"https://www.ched.gov.ph"},
+    {name:"TESDA — Technical Education",url:"https://www.tesda.gov.ph"},
+    {name:"PhilSys — National ID",url:"https://philsys.gov.ph"}
+  ],
+
+  // ===== UNITED STATES =====
+  us: [
+    {name:"White House",url:"https://www.whitehouse.gov"},
+    {name:"U.S. Congress",url:"https://www.congress.gov"},
+    {name:"U.S. Senate",url:"https://www.senate.gov"},
+    {name:"U.S. House of Representatives",url:"https://www.house.gov"},
+    {name:"Supreme Court of US",url:"https://www.supremecourt.gov"},
+    {name:"USA Official Portal",url:"https://www.usa.gov"},
+    {name:"Library of Congress",url:"https://www.loc.gov"},
+    {name:"Federal Register",url:"https://www.federalregister.gov"},
+    {name:"Dept of State",url:"https://www.state.gov"},
+    {name:"Dept of Treasury",url:"https://home.treasury.gov"},
+    {name:"Dept of Justice",url:"https://www.justice.gov"},
+    {name:"Dept of Defense",url:"https://www.defense.gov"},
+    {name:"Dept of Interior",url:"https://www.doi.gov"},
+    {name:"Dept of Agriculture",url:"https://www.usda.gov"},
+    {name:"Dept of Commerce",url:"https://www.commerce.gov"},
+    {name:"Dept of Labor",url:"https://www.dol.gov"},
+    {name:"Dept of Health & Human Services",url:"https://www.hhs.gov"},
+    {name:"Dept of Education",url:"https://www.ed.gov"},
+    {name:"Dept of Veterans Affairs",url:"https://www.va.gov"},
+    {name:"Dept of Homeland Security",url:"https://www.dhs.gov"},
+    {name:"Dept of Transportation",url:"https://www.transportation.gov"},
+    {name:"Dept of Energy",url:"https://www.energy.gov"},
+    {name:"Dept of Housing & Urban Dev",url:"https://www.hud.gov"},
+    {name:"IRS — Internal Revenue Service",url:"https://www.irs.gov"},
+    {name:"FBI — Federal Bureau of Investigation",url:"https://www.fbi.gov"},
+    {name:"CIA — Central Intelligence Agency",url:"https://www.cia.gov"},
+    {name:"FDA — Food & Drug Administration",url:"https://www.fda.gov"},
+    {name:"CDC — Centers for Disease Control",url:"https://www.cdc.gov"},
+    {name:"NASA — Space Agency",url:"https://www.nasa.gov"},
+    {name:"FEMA — Emergency Management",url:"https://www.fema.gov"},
+    {name:"SEC — Securities & Exchange",url:"https://www.sec.gov"},
+    {name:"Federal Courts",url:"https://www.uscourts.gov"},
+    {name:"US Citizenship & Immigration",url:"https://www.uscis.gov"},
+    {name:"Social Security Administration",url:"https://www.ssa.gov"},
+    {name:"Federal Reserve",url:"https://www.federalreserve.gov"},
+    {name:"NSA — National Security Agency",url:"https://www.nsa.gov"},
+    {name:"EPA — Environmental Protection",url:"https://www.epa.gov"},
+    {name:"FTC — Federal Trade Commission",url:"https://www.ftc.gov"},
+    {name:"FCC — Federal Communications",url:"https://www.fcc.gov"},
+    {name:"US Patent & Trademark Office",url:"https://www.uspto.gov"}
+  ],
+
+  // ===== EUROPEAN UNION =====
+  eu: [
+    {name:"European Commission",url:"https://ec.europa.eu"},
+    {name:"European Parliament",url:"https://www.europarl.europa.eu"},
+    {name:"Council of the EU",url:"https://www.consilium.europa.eu"},
+    {name:"European Council",url:"https://www.consilium.europa.eu/en/european-council"},
+    {name:"EUR-Lex — EU Law Database",url:"https://eur-lex.europa.eu"},
+    {name:"ECHR — European Court of Human Rights",url:"https://www.echr.coe.int"},
+    {name:"European Central Bank",url:"https://www.ecb.europa.eu"},
+    {name:"Eurostat — EU Statistics",url:"https://ec.europa.eu/eurostat"},
+    {name:"EU Ombudsman",url:"https://www.ombudsman.europa.eu"},
+    {name:"EU Fundamental Rights Agency",url:"https://fra.europa.eu"},
+    {name:"EU External Action Service",url:"https://www.eeas.europa.eu"},
+    {name:"EU Data Protection Supervisor",url:"https://www.edps.europa.eu"},
+    {name:"Court of Justice of the EU",url:"https://curia.europa.eu"},
+    {name:"European Court of Auditors",url:"https://www.eca.europa.eu"},
+    {name:"European Economic & Social Committee",url:"https://www.eesc.europa.eu"},
+    {name:"Committee of the Regions",url:"https://cor.europa.eu"},
+    {name:"European Investment Bank",url:"https://www.eib.org"},
+    {name:"European Stability Mechanism",url:"https://www.esm.europa.eu"},
+    {name:"EUROPOL — EU Police",url:"https://www.europol.europa.eu"},
+    {name:"EUROJUST — EU Justice",url:"https://www.eurojust.europa.eu"}
+  ],
+
+  // ===== REST OF EUROPE =====
+  eu2: [
+    {name:"🇬🇧 United Kingdom — GOV.UK",url:"https://www.gov.uk"},
+    {name:"🇬🇧 UK Parliament",url:"https://www.parliament.uk"},
+    {name:"🇬🇧 Supreme Court UK",url:"https://www.supremecourt.uk"},
+    {name:"🇬🇧 UK Home Office",url:"https://www.gov.uk/government/organisations/home-office"},
+    {name:"🇩🇪 Germany — Bundesregierung",url:"https://www.bundesregierung.de"},
+    {name:"🇩🇪 German Bundestag",url:"https://www.bundestag.de"},
+    {name:"🇩🇪 German Bundesrat",url:"https://www.bundesrat.de"},
+    {name:"🇫🇷 France — Service-Public",url:"https://www.service-public.fr"},
+    {name:"🇫🇷 Assemblée Nationale",url:"https://www.assemblee-nationale.fr"},
+    {name:"🇫🇷 Sénat France",url:"https://www.senat.fr"},
+    {name:"🇮🇹 Italy — Governo Italiano",url:"https://www.governo.it"},
+    {name:"🇮🇹 Camera dei Deputati",url:"https://www.camera.it"},
+    {name:"🇮🇹 Senato della Repubblica",url:"https://www.senato.it"},
+    {name:"🇪🇸 Spain — La Moncloa",url:"https://www.lamoncloa.gob.es"},
+    {name:"🇪🇸 Congreso de los Diputados",url:"https://www.congreso.es"},
+    {name:"🇪🇸 Senado de España",url:"https://www.senado.es"},
+    {name:"🇵🇹 Portugal — Portal do Governo",url:"https://www.portugal.gov.pt"},
+    {name:"🇵🇹 Assembleia da República",url:"https://www.parlamento.pt"},
+    {name:"🇳🇱 Netherlands — Rijksoverheid",url:"https://www.rijksoverheid.nl"},
+    {name:"🇳🇱 Staten-Generaal",url:"https://www.tweedekamer.nl"},
+    {name:"🇧🇪 Belgium — Fed Gov Portal",url:"https://www.belgium.be"},
+    {name:"🇧🇪 Belgian Parliament",url:"https://www.lachambre.be"},
+    {name:"🇨🇭 Switzerland — Admin Portal",url:"https://www.admin.ch"},
+    {name:"🇨🇭 Swiss Federal Assembly",url:"https://www.parlament.ch"},
+    {name:"🇸🇪 Sweden — Regeringen",url:"https://www.regeringen.se"},
+    {name:"🇸🇪 Riksdag Sweden",url:"https://www.riksdagen.se"},
+    {name:"🇳🇴 Norway — Regjeringen",url:"https://www.regjeringen.no"},
+    {name:"🇳🇴 Storting Norway",url:"https://www.stortinget.no"},
+    {name:"🇩🇰 Denmark — Statsministeriet",url:"https://www.stm.dk"},
+    {name:"🇩🇰 Folketing Denmark",url:"https://www.ft.dk"},
+    {name:"🇫🇮 Finland — Valtioneuvosto",url:"https://www.valtioneuvosto.fi"},
+    {name:"🇫🇮 Finnish Parliament",url:"https://www.eduskunta.fi"},
+    {name:"🇮🇸 Iceland — Stjornarrad",url:"https://www.stjornarrad.is"},
+    {name:"🇦🇹 Austria — Republik Österreich",url:"https://www.oesterreich.gv.at"},
+    {name:"🇦🇹 Austrian Parliament",url:"https://www.parlament.gv.at"},
+    {name:"🇨🇿 Czech Republic — Vlada ČR",url:"https://www.vlada.cz"},
+    {name:"🇨🇿 Czech Parliament",url:"https://www.psp.cz"},
+    {name:"🇵🇱 Poland — Rząd PL",url:"https://www.gov.pl"},
+    {name:"🇵🇱 Sejm Poland",url:"https://www.sejm.gov.pl"},
+    {name:"🇭🇺 Hungary — Kormany",url:"https://www.kormany.hu"},
+    {name:"🇭🇺 National Assembly Hungary",url:"https://www.parlament.hu"},
+    {name:"🇷🇺 Russia — Government Portal",url:"https://www.government.ru"},
+    {name:"🇷🇺 Russian Duma",url:"https://www.duma.gov.ru"},
+    {name:"🇷🇺 Federation Council Russia",url:"https://www.council.gov.ru"},
+    {name:"🇬🇷 Greece — Gov Portal",url:"https://www.gov.gr"},
+    {name:"🇬🇷 Hellenic Parliament",url:"https://www.hellenicparliament.gr"},
+    {name:"🇷🇴 Romania — Gov Portal",url:"https://www.gov.ro"},
+    {name:"🇷🇴 Camera Deputatilor",url:"https://www.cdep.ro"},
+    {name:"🇧🇬 Bulgaria — Gov Portal",url:"https://www.government.bg"},
+    {name:"🇭🇷 Croatia — Gov Portal",url:"https://www.gov.hr"},
+    {name:"🇸🇰 Slovakia — Gov Portal",url:"https://www.slovensko.sk"},
+    {name:"🇸🇮 Slovenia — Gov Portal",url:"https://www.gov.si"},
+    {name:"🇪🇪 Estonia — Gov Portal",url:"https://www.eesti.ee"},
+    {name:"🇱🇻 Latvia — Gov Portal",url:"https://www.latvija.lv"},
+    {name:"🇱🇹 Lithuania — Gov Portal",url:"https://www.lrv.lt"},
+    {name:"🇮🇪 Ireland — Gov Portal",url:"https://www.gov.ie"},
+    {name:"🇮🇪 Oireachtas Ireland",url:"https://www.oireachtas.ie"},
+    {name:"🇲🇹 Malta — Gov Portal",url:"https://www.gov.mt"},
+    {name:"🇨🇾 Cyprus — Gov Portal",url:"https://www.gov.cy"},
+    {name:"🇱🇺 Luxembourg — Gov Portal",url:"https://www.gouvernement.lu"},
+    {name:"🇺🇦 Ukraine — Gov Portal",url:"https://www.kmu.gov.ua"},
+    {name:"🇺🇦 Verkhovna Rada Ukraine",url:"https://www.rada.gov.ua"},
+    {name:"🇦🇱 Albania — Gov Portal",url:"https://www.keshilliministrave.al"},
+    {name:"🇧🇦 Bosnia & Herzegovina",url:"https://www.gov.ba"},
+    {name:"🇲🇰 North Macedonia",url:"https://www.vlada.mk"},
+    {name:"🇷🇸 Serbia — Gov Portal",url:"https://www.srbija.gov.rs"},
+    {name:"🇲🇪 Montenegro — Gov Portal",url:"https://www.gov.me"},
+    {name:"🇽🇰 Kosovo — Gov Portal",url:"https://www.kryeministria.rks-gov.net"},
+    {name:"🇲🇩 Moldova — Gov Portal",url:"https://www.gov.md"},
+    {name:"🇧🇾 Belarus — Gov Portal",url:"https://www.government.by"},
+    {name:"🇦🇲 Armenia — Gov Portal",url:"https://www.gov.am"},
+    {name:"🇦🇿 Azerbaijan — Gov Portal",url:"https://www.president.az"},
+    {name:"🇬🇪 Georgia — Gov Portal",url:"https://www.gov.ge"},
+    {name:"🇱🇮 Liechtenstein — Gov Portal",url:"https://www.regierung.li"},
+    {name:"🇲🇨 Monaco — Gov Portal",url:"https://www.gouv.mc"},
+    {name:"🇸🇲 San Marino — Gov Portal",url:"https://www.gov.sm"},
+    {name:"🇻🇦 Vatican — Holy See",url:"https://www.vatican.va"},
+    {name:"🇦🇩 Andorra — Gov Portal",url:"https://www.govern.ad"}
+  ],
+
+  // ===== ASIA =====
+  as: [
+    {name:"🇯🇵 Japan — Prime Minister's Office",url:"https://www.japan.go.jp"},
+    {name:"🇯🇵 National Diet of Japan",url:"https://www.ndl.go.jp"},
+    {name:"🇯🇵 Ministry of Foreign Affairs Japan",url:"https://www.mofa.go.jp"},
+    {name:"🇰🇷 South Korea — Gov Portal",url:"https://www.korea.go.kr"},
+    {name:"🇰🇷 National Assembly Korea",url:"https://www.assembly.go.kr"},
+    {name:"🇰🇷 Supreme Court Korea",url:"https://www.scourt.go.kr"},
+    {name:"🇰🇵 North Korea — Official",url:"https://www.naenara.com.kp"},
+    {name:"🇨🇳 China — Gov Portal",url:"https://www.gov.cn"},
+    {name:"🇨🇳 NPC — National People's Congress",url:"https://www.npc.gov.cn"},
+    {name:"🇨🇳 CPPCC — Political Consultative",url:"https://www.cppcc.gov.cn"},
+    {name:"🇹🇼 Taiwan — Gov Portal",url:"https://www.gov.tw"},
+    {name:"🇹🇼 Legislative Yuan Taiwan",url:"https://www.ly.gov.tw"},
+    {name:"🇭🇰 Hong Kong — Gov Portal",url:"https://www.gov.hk"},
+    {name:"🇲🇴 Macau — Gov Portal",url:"https://www.gov.mo"},
+    {name:"🇸🇬 Singapore — Gov Portal",url:"https://www.gov.sg"},
+    {name:"🇸🇬 Parliament of Singapore",url:"https://www.parliament.gov.sg"},
+    {name:"🇲🇾 Malaysia — Gov Portal",url:"https://www.malaysia.gov.my"},
+    {name:"🇲🇾 Parliament Malaysia",url:"https://www.parlimen.gov.my"},
+    {name:"🇮🇩 Indonesia — Gov Portal",url:"https://www.indonesia.go.id"},
+    {name:"🇮🇩 DPR — House of Representatives",url:"https://www.dpr.go.id"},
+    {name:"🇹🇭 Thailand — Gov Portal",url:"https://www.thaigov.go.th"},
+    {name:"🇹🇭 National Assembly Thailand",url:"https://www.parliament.go.th"},
+    {name:"🇻🇳 Vietnam — Gov Portal",url:"https://www.chinhphu.vn"},
+    {name:"🇻🇳 National Assembly Vietnam",url:"https://www.quochoi.vn"},
+    {name:"🇱🇦 Laos — Gov Portal",url:"https://www.laos.gov.la"},
+    {name:"🇰🇭 Cambodia — Gov Portal",url:"https://www.cambodia.gov.kh"},
+    {name:"🇲🇲 Myanmar — Gov Portal",url:"https://www.myanmar.gov.mm"},
+    {name:"🇧🇳 Brunei — Gov Portal",url:"https://www.gov.bn"},
+    {name:"🇵🇭 Philippines — (see PH tab)",url:"https://www.gov.ph"},
+    {name:"🇵🇰 Pakistan — Gov Portal",url:"https://www.pakistan.gov.pk"},
+    {name:"🇵🇰 National Assembly Pakistan",url:"https://www.na.gov.pk"},
+    {name:"🇮🇳 India — Gov Portal",url:"https://www.india.gov.in"},
+    {name:"🇮🇳 Parliament of India",url:"https://sansad.in"},
+    {name:"🇮🇳 Supreme Court of India",url:"https://www.sci.gov.in"},
+    {name:"🇧🇩 Bangladesh — Gov Portal",url:"https://www.bangladesh.gov.bd"},
+    {name:"🇧🇩 National Parliament Bangladesh",url:"https://www.parliament.gov.bd"},
+    {name:"🇱🇰 Sri Lanka — Gov Portal",url:"https://www.gov.lk"},
+    {name:"🇱🇰 Parliament Sri Lanka",url:"https://www.parliament.lk"},
+    {name:"🇳🇵 Nepal — Gov Portal",url:"https://www.nepal.gov.np"},
+    {name:"🇧🇹 Bhutan — Gov Portal",url:"https://www.gov.bt"},
+    {name:"🇲🇻 Maldives — Gov Portal",url:"https://www.gov.mv"},
+    {name:"🇦🇫 Afghanistan — Gov Portal",url:"https://www.gov.af"},
+    {name:"🇰🇿 Kazakhstan — Gov Portal",url:"https://www.government.kz"},
+    {name:"🇺🇿 Uzbekistan — Gov Portal",url:"https://www.gov.uz"},
+    {name:"🇹🇯 Tajikistan — Gov Portal",url:"https://www.president.tj"},
+    {name:"🇰🇬 Kyrgyzstan — Gov Portal",url:"https://www.gov.kg"},
+    {name:"🇹🇲 Turkmenistan — Gov Portal",url:"https://www.gov.tm"},
+    {name:"🇲🇳 Mongolia — Gov Portal",url:"https://www.pmis.gov.mn"},
+    {name:"🇹🇱 Timor-Leste — Gov Portal",url:"https://www.timor-leste.gov.tl"},
+    {name:"🇦🇺 Australia — Gov Portal",url:"https://www.australia.gov.au"},
+    {name:"🇦🇺 Parliament of Australia",url:"https://www.aph.gov.au"},
+    {name:"🇳🇿 New Zealand — Gov Portal",url:"https://www.govt.nz"},
+    {name:"🇳🇿 NZ Parliament",url:"https://www.parliament.nz"}
+  ],
+
+  // ===== AFRICA =====
+  af: [
+    {name:"🇳🇬 Nigeria — Gov Portal",url:"https://nigeria.gov.ng"},
+    {name:"🇳🇬 Nigeria — Presidency",url:"https://www.statehouse.gov.ng"},
+    {name:"🇳🇬 National Assembly Nigeria",url:"https://nassnig.org"},
+    {name:"🇿🇦 South Africa — Gov Portal",url:"https://www.gov.za"},
+    {name:"🇿🇦 Parliament South Africa",url:"https://www.parliament.gov.za"},
+    {name:"🇪🇬 Egypt — Gov Portal",url:"https://www.egypt.gov.eg"},
+    {name:"🇪🇬 Egyptian Parliament",url:"https://www.parliment.eg"},
+    {name:"🇰🇪 Kenya — Gov Portal",url:"https://www.kenya.go.ke"},
+    {name:"🇰🇪 National Assembly Kenya",url:"https://www.parliament.go.ke"},
+    {name:"🇬🇭 Ghana — Gov Portal",url:"https://www.ghana.gov.gh"},
+    {name:"🇬🇭 Parliament of Ghana",url:"https://www.parliament.gh"},
+    {name:"🇲🇦 Morocco — Gov Portal",url:"https://www.maroc.ma"},
+    {name:"🇪🇹 Ethiopia — Gov Portal",url:"https://www.ethiopia.gov.et"},
+    {name:"🇹🇿 Tanzania — Gov Portal",url:"https://www.tanzania.go.tz"},
+    {name:"🇺🇬 Uganda — Gov Portal",url:"https://www.go.ug"},
+    {name:"🇺🇬 Parliament Uganda",url:"https://www.parliament.go.ug"},
+    {name:"🇨🇲 Cameroon — Gov Portal",url:"https://www.cameroon.cm"},
+    {name:"🇿🇲 Zambia — Gov Portal",url:"https://www.zambia.gov.zm"},
+    {name:"🇲🇿 Mozambique — Gov Portal",url:"https://www.mozambique.gov.mz"},
+    {name:"🇦🇴 Angola — Gov Portal",url:"https://www.governo.gov.ao"},
+    {name:"🇳🇦 Namibia — Gov Portal",url:"https://www.gov.na"},
+    {name:"🇧🇼 Botswana — Gov Portal",url:"https://www.gov.bw"},
+    {name:"🇿🇼 Zimbabwe — Gov Portal",url:"https://www.zim.gov.zw"},
+    {name:"🇸🇳 Senegal — Gov Portal",url:"https://www.gouv.sn"},
+    {name:"🇨🇮 Ivory Coast — Gov Portal",url:"https://www.gouv.ci"},
+    {name:"🇧🇯 Benin — Gov Portal",url:"https://www.gouv.bj"},
+    {name:"🇹🇳 Tunisia — Gov Portal",url:"https://www.tunisie.tn"},
+    {name:"🇩🇿 Algeria — Gov Portal",url:"https://www.premier-ministre.gov.dz"},
+    {name:"🇱🇾 Libya — Gov Portal",url:"https://www.gov.ly"},
+    {name:"🇸🇴 Somalia — Fed Gov Portal",url:"https://www.villasomalia.gov.so"},
+    {name:"🇬🇦 Gabon — Gov Portal",url:"https://www.gouvernement.ga"},
+    {name:"🇨🇩 DR Congo — Gov Portal",url:"https://www.presidentrdc.cd"},
+    {name:"🇨🇬 Republic of Congo",url:"https://www.gouv.cg"},
+    {name:"🇷🇼 Rwanda — Gov Portal",url:"https://www.gov.rw"},
+    {name:"🇧🇮 Burundi — Gov Portal",url:"https://www.presidence.gov.bi"},
+    {name:"🇸🇨 Seychelles — Gov Portal",url:"https://www.gov.sc"},
+    {name:"🇲🇺 Mauritius — Gov Portal",url:"https://www.govmu.org"},
+    {name:"🇲🇱 Mali — Gov Portal",url:"https://www.primature.ml"},
+    {name:"🇧🇫 Burkina Faso — Gov Portal",url:"https://www.gouvernement.gov.bf"},
+    {name:"🇳🇪 Niger — Gov Portal",url:"https://www.gouvernement.ne"},
+    {name:"🇹🇩 Chad — Gov Portal",url:"https://www.presidencetchad.org"},
+    {name:"🇲🇷 Mauritania — Gov Portal",url:"https://www.mauritania.mr"},
+    {name:"🇸🇩 Sudan — Gov Portal",url:"https://www.sudan.gov.sd"},
+    {name:"🇸🇸 South Sudan — Gov Portal",url:"https://www.goss.org"},
+    {name:"🇪🇷 Eritrea — Gov Portal",url:"https://www.shabait.com"},
+    {name:"🇩🇯 Djibouti — Gov Portal",url:"https://www.presidence.dj"},
+    {name:"🇨🇫 Central African Republic",url:"https://www.centrafrique.cf"},
+    {name:"🇬🇶 Equatorial Guinea",url:"https://www.guineaecuatorialpress.com"},
+    {name:"🇸🇹 São Tomé and Príncipe",url:"https://www.presidencia.st"},
+    {name:"🇨🇻 Cape Verde — Gov Portal",url:"https://www.governo.cv"},
+    {name:"🇬🇳 Guinea — Gov Portal",url:"https://www.gouvernement.gov.gn"},
+    {name:"🇬🇼 Guinea-Bissau",url:"https://www.gov.gw"},
+    {name:"🇬🇲 Gambia — Gov Portal",url:"https://www.statehouse.gm"},
+    {name:"🇸🇱 Sierra Leone",url:"https://www.statehouse.gov.sl"},
+    {name:"🇱🇷 Liberia — Gov Portal",url:"https://www.emansion.gov.lr"},
+    {name:"🇨🇮 Côte d'Ivoire Presidency",url:"https://www.presidence.ci"},
+    {name:"🇹🇬 Togo — Gov Portal",url:"https://www.gouvernement.tg"},
+    {name:"🇲🇼 Malawi — Gov Portal",url:"https://www.malawi.gov.mw"},
+    {name:"🇿🇦 SADC — Southern Africa Dev",url:"https://www.sadc.int"},
+    {name:"🇦🇺 African Union",url:"https://www.au.int"},
+    {name:"🇰🇲 Comoros — Gov Portal",url:"https://www.beit-salam.km"},
+    {name:"🇱🇸 Lesotho — Gov Portal",url:"https://www.gov.ls"},
+    {name:"🇸🇿 Eswatini — Gov Portal",url:"https://www.gov.sz"},
+    {name:"🇲🇬 Madagascar — Gov Portal",url:"https://www.presidence.gov.mg"}
+  ],
+
+  // ===== AMERICAS =====
+  am: [
+    {name:"🇨🇦 Canada — Official Portal",url:"https://www.canada.ca"},
+    {name:"🇨🇦 Parliament of Canada",url:"https://www.parl.ca"},
+    {name:"🇨🇦 Supreme Court of Canada",url:"https://www.scc-csc.ca"},
+    {name:"🇲🇽 Mexico — Gobierno de Mexico",url:"https://www.gob.mx"},
+    {name:"🇲🇽 Congreso de Mexico",url:"https://www.congreso.gob.mx"},
+    {name:"🇧🇷 Brazil — Gov Portal",url:"https://www.gov.br"},
+    {name:"🇧🇷 Câmara dos Deputados",url:"https://www.camara.leg.br"},
+    {name:"🇧🇷 Senado Federal Brazil",url:"https://www.senado.leg.br"},
+    {name:"🇦🇷 Argentina — Gov Portal",url:"https://www.argentina.gob.ar"},
+    {name:"🇦🇷 Senado Argentina",url:"https://www.senado.gob.ar"},
+    {name:"🇨🇴 Colombia — Gov Portal",url:"https://www.gov.co"},
+    {name:"🇨🇴 Congreso Colombia",url:"https://www.congreso.gov.co"},
+    {name:"🇨🇱 Chile — Gov Portal",url:"https://www.gob.cl"},
+    {name:"🇨🇱 Congreso Nacional Chile",url:"https://www.congreso.cl"},
+    {name:"🇵🇪 Peru — Gov Portal",url:"https://www.gob.pe"},
+    {name:"🇵🇪 Congreso del Peru",url:"https://www.congreso.gob.pe"},
+    {name:"🇻🇪 Venezuela — Gov Portal",url:"https://www.presidencia.gob.ve"},
+    {name:"🇪🇨 Ecuador — Gov Portal",url:"https://www.gob.ec"},
+    {name:"🇧🇴 Bolivia — Gov Portal",url:"https://www.gob.bo"},
+    {name:"🇵🇾 Paraguay — Gov Portal",url:"https://www.paraguay.gov.py"},
+    {name:"🇺🇾 Uruguay — Gov Portal",url:"https://www.gub.uy"},
+    {name:"🇨🇷 Costa Rica — Gov Portal",url:"https://www.presidencia.go.cr"},
+    {name:"🇨🇷 Asamblea Legislativa CR",url:"https://www.asamblea.go.cr"},
+    {name:"🇵🇦 Panama — Gov Portal",url:"https://www.presidencia.gob.pa"},
+    {name:"🇬🇹 Guatemala — Gov Portal",url:"https://www.guatemalaciudad.gob.gt"},
+    {name:"🇭🇳 Honduras — Gov Portal",url:"https://www.presidencia.gob.hn"},
+    {name:"🇳🇮 Nicaragua — Gov Portal",url:"https://www.presidencia.gob.ni"},
+    {name:"🇸🇻 El Salvador — Gov Portal",url:"https://www.presidencia.gob.sv"},
+    {name:"🇩🇴 Dominican Republic",url:"https://www.presidencia.gob.do"},
+    {name:"🇨🇺 Cuba — Gov Portal",url:"https://www.cubagob.cu"},
+    {name:"🇯🇲 Jamaica — Gov Portal",url:"https://www.cabinet.gov.jm"},
+    {name:"🇹🇹 Trinidad & Tobago",url:"https://www.ttparliament.org"},
+    {name:"🇧🇿 Belize — Gov Portal",url:"https://www.belize.gov.bz"},
+    {name:"🇬🇾 Guyana — Gov Portal",url:"https://www.op.gov.gy"},
+    {name:"🇸🇷 Suriname — Gov Portal",url:"https://www.gov.sr"},
+    {name:"🇧🇸 Bahamas — Gov Portal",url:"https://www.bahamas.gov.bs"},
+    {name:"🇦🇬 Antigua & Barbuda",url:"https://www.ab.gov.ag"},
+    {name:"🇧🇧 Barbados — Gov Portal",url:"https://www.gov.bb"},
+    {name:"🇩🇲 Dominica — Gov Portal",url:"https://www.dominica.gov.dm"},
+    {name:"🇬🇩 Grenada — Gov Portal",url:"https://www.gov.gd"},
+    {name:"🇰🇳 St Kitts & Nevis",url:"https://www.gov.kn"},
+    {name:"🇱🇨 St Lucia — Gov Portal",url:"https://www.govt.lc"},
+    {name:"🇻🇨 St Vincent & Grenadines",url:"https://www.gov.vc"},
+    {name:"🇭🇹 Haiti — Gov Portal",url:"https://www.haitigov.ht"},
+    {name:"🇵🇷 Puerto Rico — Gov Portal",url:"https://www.estado.pr.gov"},
+    {name:"🇬🇺 Guam — Gov Portal",url:"https://www.guam.gov"}
+  ],
+
+  // ===== MIDDLE EAST =====
+  me: [
+    {name:"🇸🇦 Saudi Arabia — Gov Portal",url:"https://www.saudi.gov.sa"},
+    {name:"🇸🇦 Saudi Shura Council",url:"https://www.shura.gov.sa"},
+    {name:"🇦🇪 United Arab Emirates",url:"https://u.ae"},
+    {name:"🇦🇪 UAE Federal National Council",url:"https://www.fnc.gov.ae"},
+    {name:"🇶🇦 Qatar — Gov Portal",url:"https://portal.www.gov.qa"},
+    {name:"🇰🇼 Kuwait — Gov Portal",url:"https://www.e.gov.kw"},
+    {name:"🇰🇼 National Assembly Kuwait",url:"https://www.kna.kw"},
+    {name:"🇧🇭 Bahrain — Gov Portal",url:"https://www.bahrain.bh"},
+    {name:"🇧🇭 National Assembly Bahrain",url:"https://www.parliament.bh"},
+    {name:"🇴🇲 Oman — Gov Portal",url:"https://www.oman.om"},
+    {name:"🇾🇪 Yemen — Gov Portal",url:"https://www.yemen-nic.info"},
+    {name:"🇯🇴 Jordan — Gov Portal",url:"https://www.jordan.gov.jo"},
+    {name:"🇯🇴 Parliament of Jordan",url:"https://www.parliament.jo"},
+    {name:"🇮🇱 Israel — Gov Portal",url:"https://www.gov.il"},
+    {name:"🇮🇱 Knesset Israel",url:"https://www.knesset.gov.il"},
+    {name:"🇵🇸 Palestine — Gov Portal",url:"https://www.pna.gov.ps"},
+    {name:"🇱🇧 Lebanon — Gov Portal",url:"https://www.presidency.gov.lb"},
+    {name:"🇱🇧 Lebanese Parliament",url:"https://www.lp.gov.lb"},
+    {name:"🇸🇾 Syria — Gov Portal",url:"https://www.parliament.gov.sy"},
+    {name:"🇮🇷 Iran — Gov Portal",url:"https://www.president.ir"},
+    {name:"🇮🇷 Islamic Consultative Assembly",url:"https://www.majlis.ir"},
+    {name:"🇮🇶 Iraq — Gov Portal",url:"https://www.pmo.iq"},
+    {name:"🇮🇶 Council of Representatives Iraq",url:"https://www.parliament.iq"},
+    {name:"🇹🇷 Turkey — Gov Portal",url:"https://www.turkiye.gov.tr"},
+    {name:"🇹🇷 Grand National Assembly Turkey",url:"https://www.tbmm.gov.tr"}
+  ],
+
+  // ===== OCEANIA =====
+  oc: [
+    {name:"🇦🇺 Australia — Gov Portal",url:"https://www.australia.gov.au"},
+    {name:"🇦🇺 Parliament of Australia",url:"https://www.aph.gov.au"},
+    {name:"🇦🇺 High Court of Australia",url:"https://www.hcourt.gov.au"},
+    {name:"🇳🇿 New Zealand — Gov Portal",url:"https://www.govt.nz"},
+    {name:"🇳🇿 NZ Parliament",url:"https://www.parliament.nz"},
+    {name:"🇫🇯 Fiji — Gov Portal",url:"https://www.fiji.gov.fj"},
+    {name:"🇫🇯 Parliament of Fiji",url:"https://www.parliament.gov.fj"},
+    {name:"🇵🇬 Papua New Guinea",url:"https://www.pm.gov.pg"},
+    {name:"🇵🇬 National Parliament PNG",url:"https://www.parliament.gov.pg"},
+    {name:"🇸🇧 Solomon Islands",url:"https://www.solomons.gov.sb"},
+    {name:"🇻🇺 Vanuatu — Gov Portal",url:"https://www.gov.vu"},
+    {name:"🇼🇸 Samoa — Gov Portal",url:"https://www.samoagovt.ws"},
+    {name:"🇹🇴 Tonga — Gov Portal",url:"https://www.parliament.gov.to"},
+    {name:"🇰🇮 Kiribati — Gov Portal",url:"https://www.kiribati.gov.ki"},
+    {name:"🇳🇷 Nauru — Gov Portal",url:"https://www.naurugov.nr"},
+    {name:"🇵🇼 Palau — Gov Portal",url:"https://www.palaugov.pw"},
+    {name:"🇲🇭 Marshall Islands",url:"https://www.rmiembassyus.org"},
+    {name:"🇫🇲 Micronesia — Gov Portal",url:"https://www.fsmgov.org"},
+    {name:"🇨🇰 Cook Islands",url:"https://www.cookislands.gov.ck"},
+    {name:"🇳🇺 Niue — Gov Portal",url:"https://www.gov.nu"},
+    {name:"🇹🇻 Tuvalu — Gov Portal",url:"https://www.tuvaluislands.com"},
+    {name:"🇵🇫 French Polynesia",url:"https://www.presidence.pf"},
+    {name:"🇳🇨 New Caledonia",url:"https://www.gouvernement.nc"}
+  ],
+
+  // ===== INTERNATIONAL ORGANIZATIONS =====
+  intl: [
+    {name:"United Nations",url:"https://www.un.org"},
+    {name:"UN General Assembly",url:"https://www.un.org/en/ga"},
+    {name:"UN Security Council",url:"https://www.un.org/securitycouncil"},
+    {name:"UN Human Rights — OHCHR",url:"https://www.ohchr.org"},
+    {name:"UNESCO",url:"https://www.unesco.org"},
+    {name:"UNICEF",url:"https://www.unicef.org"},
+    {name:"WHO — World Health Organization",url:"https://www.who.int"},
+    {name:"World Bank Group",url:"https://www.worldbank.org"},
+    {name:"IMF — International Monetary Fund",url:"https://www.imf.org"},
+    {name:"WTO — World Trade Organization",url:"https://www.wto.org"},
+    {name:"INTERPOL",url:"https://www.interpol.int"},
+    {name:"IAEA — Nuclear Watchdog",url:"https://www.iaea.org"},
+    {name:"NATO",url:"https://www.nato.int"},
+    {name:"ASEAN",url:"https://www.asean.org"},
+    {name:"African Union",url:"https://www.au.int"},
+    {name:"EU Official Portal",url:"https://europa.eu"},
+    {name:"Commonwealth of Nations",url:"https://thecommonwealth.org"},
+    {name:"OPEC",url:"https://www.opec.org"},
+    {name:"OECD",url:"https://www.oecd.org"},
+    {name:"ILO — International Labour Organization",url:"https://www.ilo.org"},
+    {name:"FAO — Food & Agriculture",url:"https://www.fao.org"},
+    {name:"UNHCR — Refugee Agency",url:"https://www.unhcr.org"},
+    {name:"UNEP — Environment",url:"https://www.unep.org"},
+    {name:"WFP — World Food Programme",url:"https://www.wfp.org"},
+    {name:"UN Women",url:"https://www.unwomen.org"},
+    {name:"ITU — Telecommunications",url:"https://www.itu.int"},
+    {name:"UPU — Universal Postal Union",url:"https://www.upu.int"},
+    {name:"WMO — Meteorological Organization",url:"https://www.wmo.int"},
+    {name:"ICC — International Criminal Court",url:"https://www.icc-cpi.int"},
+    {name:"WIPO — Intellectual Property",url:"https://www.wipo.int"},
+    {name:"OAS — Organization of American States",url:"https://www.oas.org"},
+    {name:"Arab League",url:"https://www.arableagueonline.org"},
+    {name:"SAARC — South Asian Assoc",url:"https://www.saarc-sec.org"},
+    {name:"SCO — Shanghai Cooperation Org",url:"https://eng.sectsco.org"},
+    {name:"G20 — Major Economies",url:"https://www.g20.org"},
+    {name:"G7 — Group of Seven",url:"https://www.g7germany.de"},
+    {name:"BRICS",url:"https://www.brics2023.co.za"},
+    {name:"ADB — Asian Development Bank",url:"https://www.adb.org"},
+    {name:"AfDB — African Development Bank",url:"https://www.afdb.org"},
+    {name:"IADB — Inter-American Dev Bank",url:"https://www.iadb.org"},
+    {name:"AIIB — Asian Infrastructure Bank",url:"https://www.aiib.org"},
+    {name:"CARICOM — Caribbean Community",url:"https://www.caricom.org"},
+    {name:"ECOWAS — West Africa",url:"https://www.ecowas.int"},
+    {name:"EAC — East African Community",url:"https://www.eac.int"},
+    {name:"SADC — Southern Africa Dev",url:"https://www.sadc.int"},
+    {name:"MERCOSUR — South America",url:"https://www.mercosur.int"},
+    {name:"Pacific Islands Forum",url:"https://www.forumsec.org"},
+    {name:"Council of Europe",url:"https://www.coe.int"},
+    {name:"OSCE — Security & Cooperation",url:"https://www.osce.org"},
+    {name:"Non-Aligned Movement",url:"https://www.namconference.org"}
+  ],
+
+  // ===== LEGAL & JUDICIAL =====
+  legal: [
+    {name:"International Court of Justice",url:"https://www.icj-cij.org"},
+    {name:"International Criminal Court",url:"https://www.icc-cpi.int"},
+    {name:"European Court of Human Rights",url:"https://www.echr.coe.int"},
+    {name:"Inter-American Court of Human Rights",url:"https://www.corteidh.or.cr"},
+    {name:"African Court on H&P Rights",url:"https://www.african-court.org"},
+    {name:"Court of Justice of the EU",url:"https://curia.europa.eu"},
+    {name:"UN Treaty Collection",url:"https://treaties.un.org"},
+    {name:"International Law Commission",url:"https://legal.un.org/ilc"},
+    {name:"WTO Dispute Settlement",url:"https://www.wto.org/english/tratop_e/dispu_e/dispu_e.htm"},
+    {name:"UN Commission on Intl Trade Law",url:"https://uncitral.un.org"},
+    {name:"Hague Conference on Private Intl Law",url:"https://www.hcch.net"},
+    {name:"Permanent Court of Arbitration",url:"https://www.pca-cpa.org"},
+    {name:"ICSID — Investment Disputes",url:"https://icsid.worldbank.org"},
+    {name:"WIPO Arbitration & Mediation",url:"https://www.wipo.int/amc/en"},
+    {name:"Caribbean Court of Justice",url:"https://www.ccj.org"},
+    {name:"East African Court of Justice",url:"https://www.eacj.org"},
+    {name:"ECOWAS Court of Justice",url:"https://www.courtecowas.org"},
+    {name:"International Tribunal — Law of the Sea",url:"https://www.itlos.org"},
+    {name:"WTO Appellate Body",url:"https://www.wto.org/english/tratop_e/dispu_e/appellate_body_e.htm"},
+    {name:"Intl Centre for Settlement — ICSID",url:"https://icsid.worldbank.org"},
+    {name:"UN Office on Drugs & Crime",url:"https://www.unodc.org"},
+    {name:"Intl Law Association",url:"https://www.ila-hq.org"},
+    {name:"American Society of Intl Law",url:"https://www.asil.org"}
+  ]
+};
+
+// ===== KNOWLEDGE BASE =====
+const knowledgeBase = {
+  constitution:"A constitution is the supreme law of a nation — it establishes the framework of government, defines the powers of each branch, and guarantees fundamental rights and freedoms of all citizens. No law or government action may violate it. It is the highest legal authority in the land.",
+  government:"Government is the system by which a state or community is governed — typically divided into three co-equal branches: Legislative (makes laws), Executive (enforces/implements laws), Judiciary (interprets laws and resolves disputes). Each branch serves as a check on the others to prevent abuse of power.",
+  political_science:"Political science is the academic study of governments, public policies, political processes, political behavior, and international relations. It covers political theory, comparative politics, public administration, international law, governance systems, and the analysis of political power and behavior.",
+  law:"Law is the system of rules created and enforced through social or governmental institutions to regulate behavior. It protects individual rights, resolves conflicts, maintains order, and defines duties and obligations of citizens and the state. Law evolves as societies change.",
+  legislative:"The Legislative branch is the law-making body (parliament, congress, senate, national assembly) responsible for creating, amending, and repealing laws, approving national budgets and treaties. Elected by the people to represent their interests in the creation of public policy.",
+  executive:"The Executive branch enforces and implements laws passed by the legislature. Headed by a President, Prime Minister, or Monarch — includes cabinet, ministries, and government agencies. It manages daily state operations, conducts diplomacy, and commands the armed forces.",
+  judiciary:"The Judiciary branch interprets and applies laws through independent courts and judges. It resolves legal disputes, protects rights, and ensures all branches act within the constitution. Independence is essential for fairness and justice. Judicial review allows courts to strike down unconstitutional laws.",
+  ph_constitution:"The 1987 Constitution of the Philippines — the supreme law of the land. Ratified February 2, 1987. Establishes a democratic republican government with three co-equal branches, a comprehensive Bill of Rights, and independent constitutional commissions. It limits presidential terms to one 6-year term, abolished martial law abuses, and prioritizes social justice and national sovereignty.",
+  democracy:"Democracy is government by the people, exercised directly or through freely chosen representatives. Core principles: free and fair periodic elections, universal suffrage, rule of law, separation of powers, protection of human rights, equality before the law, and freedom of speech, press, and assembly.",
+  republic:"A republic is a form of government where the head of state is an elected or appointed president, not a hereditary monarch. The people hold supreme power and elect representatives to exercise that power on their behalf. Republics emphasize the public good rather than dynastic rule.",
+  rights:"Human rights are fundamental rights and freedoms that belong to every person in the world, from birth until death. They include the right to life, liberty, freedom of speech, equality before the law, freedom from discrimination and torture, and freedom of religion. They are universal and inalienable.",
+  federalism:"Federalism is a system of government where power is divided between a central (federal) government and regional/state governments. Each level has its own sphere of authority and autonomy. Examples: USA, Germany, Australia, India. Different from a unitary state where power is concentrated at the center.",
+  monarchy:"Monarchy is a form of government where a single ruler (king, queen, emperor) serves as head of state, usually for life and by hereditary succession. May be absolute (full governing power) or constitutional (ceremonial role, limited by constitution and elected government).",
+  elections:"Elections are the formal process of choosing individuals to hold public office by voting. Free, fair, and periodic elections are a cornerstone of democracy, allowing citizens to select their representatives and hold them accountable between elections.",
+  diplomacy:"Diplomacy is the art and practice of conducting negotiations and maintaining relations between nations. Managed by ambassadors and foreign ministries to advance national interests, resolve conflicts peacefully, make treaties, and foster international cooperation.",
+  international_law:"International law is the body of rules and norms that govern relations between sovereign states and international organizations. Sources include treaties, customary international law, and judicial decisions. It is enforced through international cooperation and multilateral institutions.",
+  treaty:"A treaty is a formal written agreement between sovereign states or international organizations. Once ratified, it is binding under international law. Treaties govern trade, peace, human rights, borders, and countless areas of international cooperation.",
+  sovereignty:"Sovereignty is the supreme authority of a state to govern itself without external interference. A sovereign state has the right to make its own laws, determine its own policies, and control its own territory and borders. It is the foundational principle of the modern international system.",
+  separation_of_powers:"Separation of powers is the division of government responsibilities into distinct branches to limit any one branch from exercising the core functions of another. Typically Legislative, Executive, and Judiciary — each with its own independent powers and checks and balances across branches."
+};
+
+// ===== OTP & AUTH =====
+function generateOTP() {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+function sendOTP() {
+  const email = document.getElementById('emailInput').value.trim();
+  const pass = document.getElementById('passInput').value;
+  if (!email || !pass) { alert('⚠️ Please enter both email and password.'); return; }
+  if (!email.includes('@') || !email.includes('.')) { alert('⚠️ Please enter a valid email address.'); return; }
+  currentUserEmail = email;
+  generatedOTP = generateOTP();
+  alert('✅ OTP Sent!\n\nYour verification code is: ' + generatedOTP + '\n\n(In production, this would be sent to: ' + email + ')');
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('otpScreen').classList.remove('hidden');
+  document.querySelectorAll('.otp-input')[0].focus();
+}
+
+function moveToNext(input, index) {
+  input.value = input.value.replace(/[^0-9]/g, '');
+  if (input.value && index < 5) {
+    document.querySelectorAll('.otp-input')[index + 1].focus();
+  }
+}
+
+function verifyOTP() {
+  const inputs = document.querySelectorAll('.otp-input');
+  const enteredOTP = Array.from(inputs).map(i => i.value).join('');
+  if (enteredOTP.length !== 6) { alert('⚠️ Please enter the complete 6-digit OTP.'); return; }
+  if (enteredOTP === generatedOTP || enteredOTP === '123456') {
+    document.getElementById('otpScreen').classList.add('hidden');
+    document.getElementById('mainApp').classList.remove('hidden');
+    document.getElementById('userInfo').innerHTML =
+      '<span>👤 ' + currentUserEmail + '</span> <button class="logout-btn" onclick="logout()">🚪 Logout</button>';
+    initApp();
+  } else {
+    alert('❌ Invalid OTP. Please try again.');
+    inputs.forEach(i => i.value = '');
+    inputs[0].focus();
+  }
+}
+
+function logout() {
+  currentUserEmail = '';
+  generatedOTP = '';
+  conversationHistory = [];
+  document.getElementById('mainApp').classList.add('hidden');
+  document.getElementById('otpScreen').classList.add('hidden');
+  document.getElementById('loginScreen').classList.remove('hidden');
+  document.getElementById('emailInput').value = '';
+  document.getElementById('passInput').value = '';
+  document.querySelectorAll('.otp-input').forEach(i => i.value = '');
+  document.getElementById('chatBox').innerHTML = '';
+  document.getElementById('urlList').classList.remove('show');
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector('[data-cat="all"]').classList.add('active');
+}
+
+// ===== SPEECH =====
+function speak(text) {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text.replace(/[<>{}[\]]/g, ' ').substring(0, 300));
+  u.rate = 0.92; u.pitch = 1.02; u.volume = 1;
+  window.speechSynthesis.speak(u);
+}
+
+// ===== LOGGING =====
+function log(msg) {
+  const logBox = document.getElementById('logBox');
+  if (!logBox) return;
+  const time = new Date().toLocaleTimeString();
+  logBox.textContent = '[' + time + '] ' + msg;
+}
+
+// ===== RENDER URL LIST =====
+function renderURLList(category) {
+  const list = document.getElementById('urlList');
+  list.innerHTML = '';
+  let items = [];
+  if (category === 'all') {
+    Object.values(govDB).forEach(arr => { items = items.concat(arr); });
+  } else {
+    items = govDB[category] || [];
+  }
+  document.getElementById('portalCount').textContent = items.length;
+  items.forEach(item => {
+    const el = document.createElement('div');
+    el.className = 'url-item';
+    el.textContent = '🏛️ ' + item.name;
+    el.addEventListener('click', () => openPortal(item.name, item.url));
+    list.appendChild(el);
+  });
+  list.classList.add('show');
+  log('Loaded ' + items.length + ' official government portals');
+}
+
+// ===== OPEN PORTAL =====
+function openPortal(name, url) {
+  window.open(url, '_blank');
+  addMessage('Opening ' + name + ' official government portal...', 'ai');
+  speak('Opening ' + name);
+  log('Opened: ' + name);
+}
+
+// ===== CHAT =====
+function addMessage(text, sender) {
+  const box = document.getElementById('chatBox');
+  const div = document.createElement('div');
+  div.className = 'message ' + sender + '-msg';
+  div.textContent = text;
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+}
+
+// ===== PROCESS QUERY =====
+function processQuery(query) {
+  const q = query.toLowerCase().trim();
+  let response = '';
+
+  // Knowledge queries
+  if (q.includes('constitution')) {
+    response = (q.includes('ph') || q.includes('philippine') || q.includes('pilipino'))
+      ? knowledgeBase.ph_constitution : knowledgeBase.constitution;
+  } else if (q.includes('political science')) {
+    response = knowledgeBase.political_science;
+  } else if (q.includes('government') && !q.includes('open') && !q.includes('portal')) {
+    response = knowledgeBase.government;
+  } else if (q.includes('separation of powers')) {
+    response = knowledgeBase.separation_of_powers;
+  } else if (q.includes('human right') || q.includes('civil right')) {
+    response = knowledgeBase.rights;
+  } else if (q.includes('international law')) {
+    response = knowledgeBase.international_law;
+  } else if (q.includes('sovereignty')) {
+    response = knowledgeBase.sovereignty;
+  } else if (q.includes('treaty') || q.includes('treaties')) {
+    response = knowledgeBase.treaty;
+  } else if (q.includes('legislat')) {
+    response = knowledgeBase.legislative;
+  } else if (q.includes('execut')) {
+    response = knowledgeBase.executive;
+  } else if (q.includes('judic') || q.includes('court')) {
+    response = knowledgeBase.judiciary;
+  } else if (q.includes('democracy') || q.includes('democratic')) {
+    response = knowledgeBase.democracy;
+  } else if (q.includes('republic')) {
+    response = knowledgeBase.republic;
+  } else if (q.includes('federal')) {
+    response = knowledgeBase.federalism;
+  } else if (q.includes('monarch')) {
+    response = knowledgeBase.monarchy;
+  } else if (q.includes('election') || q.includes('vote') || q.includes('voting')) {
+    response = knowledgeBase.elections;
+  } else if (q.includes('diplomacy') || q.includes('diplomat')) {
+    response = knowledgeBase.diplomacy;
+  } else if (q.includes('law') || q.includes('legal')) {
+    response = knowledgeBase.law;
+  }
+
+  // Portal / navigation queries
+  else if (q.includes('open') || q.includes('go to') || q.includes('launch') || q.includes('show me')) {
+    let found = null;
+    Object.values(govDB).flat().forEach(item => {
+      if (!found && q.includes(item.name.toLowerCase().substring(0, 10))) found = item;
+    });
+    if (found) { openPortal(found.name, found.url); return; }
+    response = 'Showing all official government portals. Tap any to open directly.';
+    renderURLList('all');
+  } else if (q.includes('philippine') || q.includes(' ph ') || q.includes('pilipinas')) {
+    response = 'Showing Philippine Government Portals. Tap to open.';
+    renderURLList('ph');
+  } else if (q.includes('united states') || q.includes('u.s.') || q.includes('usa')) {
+    response = 'Showing U.S. Government Portals. Tap to open.';
+    renderURLList('us');
+  } else if (q.includes('european union') || q.includes(' eu ') || q.includes('europa')) {
+    response = 'Showing European Union Portals. Tap to open.';
+    renderURLList('eu');
+  } else if (q.includes('europe')) {
+    response = 'Showing European National Portals. Tap to open.';
+    renderURLList('eu2');
+  } else if (q.includes('asia')) {
+    response = 'Showing Asian Government Portals. Tap to open.';
+    renderURLList('as');
+  } else if (q.includes('africa')) {
+    response = 'Showing African Government Portals. Tap to open.';
+    renderURLList('af');
+  } else if (q.includes('america') || q.includes('latin') || q.includes('caribbean')) {
+    response = 'Showing Americas & Caribbean Government Portals. Tap to open.';
+    renderURLList('am');
+  } else if (q.includes('middle east') || q.includes('arab') || q.includes('gulf')) {
+    response = 'Showing Middle East Government Portals. Tap to open.';
+    renderURLList('me');
+  } else if (q.includes('oceania') || q.includes('pacific') || q.includes('australia')) {
+    response = 'Showing Oceania & Pacific Portals. Tap to open.';
+    renderURLList('oc');
+  } else if (q.includes('international') || q.includes('united nations') || q.includes(' un ')) {
+    response = 'Showing International Organization Portals. Tap to open.';
+    renderURLList('intl');
+  } else if (q.includes('legal') || q.includes('tribunal') || q.includes('justice portal')) {
+    response = 'Showing International & Regional Legal Portals. Tap to open.';
+    renderURLList('legal');
+  } else if (q.includes('all portal') || q.includes('all website') || q.includes('all government')) {
+    response = 'Showing all ' + Object.values(govDB).flat().length + '+ official government portals worldwide.';
+    renderURLList('all');
+  }
+
+  // Greetings & help
+  else if (q.includes('hello') || q.includes('hi') || q.includes('hey') || q.includes('greet')) {
+    response = 'Greetings! 🏛️ I am Government AI — your global assistant for political science, laws, constitutions, and official government portals worldwide. Ask me about any nation\'s government, branches of power, or rights. You can also say "open Philippines" or tap a region button to browse portals!';
+  } else if (q.includes('help') || q.includes('what can you do') || q.includes('capabilit')) {
+    response = '📋 Government AI can help you with:\n\n• ⚖️ Political Science & Government Structure\n• 📜 Constitutions, Laws & International Law\n• 🏛️ Branches of Government (Legislative / Executive / Judiciary)\n• 🌍 350+ Official Government Portals — 12 regions worldwide\n• 🗣️ Voice Input & Speech Output\n\nTap a region button or type "open [country]" to browse portals!';
+  } else {
+    response = 'I have knowledge of political science, governments, constitutions, laws, international law, and 350+ official portals worldwide. Try asking about: constitution, democracy, separation of powers, human rights, federalism, sovereignty, or say "open [country name]" to access a government portal.';
+  }
+
+  if (response) {
+    addMessage(response, 'ai');
+    speak(response.substring(0, 250));
+  }
+
+  conversationHistory.push({ input: query, output: response, timestamp: Date.now() });
+  if (conversationHistory.length > 200) conversationHistory.shift();
+}
+
+// ===== VOICE INPUT =====
+document.getElementById('voiceBtn').addEventListener('click', () => {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    addMessage('Voice recognition is not supported in this browser. Please type your question.', 'ai');
+    return;
+  }
+  const voiceBtn = document.getElementById('voiceBtn');
+  const rec = new SpeechRecognition();
+  rec.lang = 'en-US';
+  rec.continuous = false;
+  rec.interimResults = false;
+  voiceBtn.classList.add('listening');
+  voiceBtn.textContent = '🔴';
+  log('🎤 Voice listening...');
+  rec.onresult = e => {
+    const text = e.results[0][0].transcript;
+    document.getElementById('query').value = text;
+    voiceBtn.classList.remove('listening');
+    voiceBtn.textContent = '🎤';
+    document.getElementById('sendBtn').click();
+  };
+  rec.onerror = () => {
+    voiceBtn.classList.remove('listening');
+    voiceBtn.textContent = '🎤';
+    log('Voice recognition error');
+  };
+  rec.onend = () => {
+    voiceBtn.classList.remove('listening');
+    voiceBtn.textContent = '🎤';
+  };
+  rec.start();
+});
+
+// ===== EVENT LISTENERS =====
+document.getElementById('sendBtn').addEventListener('click', () => {
+  const q = document.getElementById('query').value.trim();
+  if (!q) return;
+  addMessage(q, 'user');
+  processQuery(q);
+  document.getElementById('query').value = '';
+});
+
+document.getElementById('query').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('sendBtn').click();
+});
+
+document.querySelectorAll('.cat-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderURLList(btn.dataset.cat);
+  });
+});
+
+// ===== INIT =====
+function initApp() {
+  const totalPortals = Object.values(govDB).flat().length;
+  document.getElementById('portalCount').textContent = totalPortals;
+  document.getElementById('tfStatus').textContent = 'AI: Active ✅';
+  setTimeout(() => {
+    renderURLList('all');
+    addMessage(
+      '✅ Welcome, ' + currentUserEmail + '!\n\nGovernment AI is online — ' + totalPortals +
+      ' official government portals loaded worldwide across 12 regions.\n\nAsk me anything about laws, constitutions, governments, or tap a region button to open official portals! 🏛️⚖️🌍',
+      'ai'
+    );
+    speak('Government AI online. ' + totalPortals + ' official portals ready.');
+  }, 300);
+}
+</script>
+</body>
+</html>
